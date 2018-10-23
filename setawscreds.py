@@ -74,5 +74,5 @@ os.environ["PROMPT"] = "(AWSMFA) $P$G"
 	  
 # execute a new shell
 subprocess.run(os.environ['COMSPEC'])
-
+#subprocess.run("C:\Program Files\Git\git-bash.exe")
 
