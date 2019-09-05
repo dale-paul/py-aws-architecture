@@ -10,7 +10,7 @@ ec2 = session.resource('ec2')
 
 """ VPCs """
 level=0
-vpcFmt='{0}{1:20}{2:20}{3:15}'
+vpcFmt='{0}{1:25}{2:30}{3}'
 print(vpcFmt.format('\t'*level,'VPC-ID','NAME','CIDR'))
 for vpc in ec2.vpcs.all():
     name = [ x['Value'] for x in (d for d in vpc.tags if 'Name' in d['Key'] )][0]
@@ -22,11 +22,11 @@ for vpc in ec2.vpcs.all():
     routeTbls = vpc.route_tables.all()
     
 	### SUBNETS
-    subnetFmt = '{0}{1:17}{2:30}{3:16}{4:20}'
+    subnetFmt = '{0}{1:25}{2:30}{3:20}{4}'
     print(subnetFmt.format('\t'*level,'SUBNET-ID','NAME','CIDR','Route Table'))
     for subnet in vpc.subnets.all():
         nameTag = next((i['Value'] for i in subnet.tags if i['Key'] == 'Name'),None)
-        rid = next((r.id for r in routeTbls.filter(Filters=[{'Name':'association.subnet-id','Values': [subnet.id]}])),None)
+        rid = next((r.id for r in routeTbls.filter(Filters=[{'Name':'association.subnet-id','Values': [subnet.id]}])),'None')
         print(subnetFmt.format('\t'*level,subnet.id,nameTag,subnet.cidr_block,rid))
         ### public network interfaces in this subnet
         ifaces = [e for e in subnet.network_interfaces.filter(Filters=[{'Name':'attachment.status','Values':['attached']}]) if e.association != None]
@@ -41,7 +41,7 @@ for vpc in ec2.vpcs.all():
     print('\t'*level,'-'*10,'\n')
     
     ### ROUTE TABLES 
-    rtblFmt = '{0}{1:17}{2:30}'
+    rtblFmt = '{0}{1:25}{2}'
     print(rtblFmt.format('\t'*level,'ROUTE-TABLE-ID','NAME'))
     for rtbl in routeTbls:
         nameTag = next((i['Value'] for i in rtbl.tags if i['Key'] == 'Name'),None)
@@ -49,20 +49,20 @@ for vpc in ec2.vpcs.all():
        
         ### ROUTES
         level += 1
-        routeFmt = '{0}{1:16}{2:22}{3:10}'
+        routeFmt = '{0}{1:20}{2:25}{3:10}'
         print(routeFmt.format('\t'*level,'DESTINATION', 'TARGET', 'STATUS'))
         for rte in rtbl.routes:
-           tgt = rte.gateway_id or rte.instance_id or rte.nat_gateway_id or rte.network_interface_id or rte.vpc_peering_connection_id
+           tgt = rte.gateway_id or rte.instance_id or rte.nat_gateway_id or rte.network_interface_id or rte.vpc_peering_connection_id or rte.transit_gateway_id
            print(routeFmt.format('\t'*level, rte.destination_cidr_block, tgt, rte.state))
         level -= 1
     print('\t'*level,'-'*10,'\n')
         
     ### SECURITY GROUPS
-    sgFmt = '{0}{1:16}{2:32}{3}'
+    sgFmt = '{0}{1:25}{2}'
     permFmt = '{0}{1:10}{2:15}{3}'
-    print(sgFmt.format('\t'*level,'SEC-GROUP-ID','NAME','DESCRIPTION'))
+    print(sgFmt.format('\t'*level,'SEC-GROUP-ID','GROUP NAME'))
     for grp in vpc.security_groups.all():
-        print(sgFmt.format('\t'*level,grp.id,grp.group_name,grp.description))
+        print(sgFmt.format('\t'*level,grp.id,grp.group_name))
         level += 1
         if grp.ip_permissions:
             print("{0}INBOUND".format('\t'*level))
