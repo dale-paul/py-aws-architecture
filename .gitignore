@@ -1,4 +1,5 @@
 src/*.txt
+aws.code-workspace
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -9,6 +10,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+.vscode
 .git
 .Python
 Include/

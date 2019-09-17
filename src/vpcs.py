@@ -1,3 +1,6 @@
+# Script to dump VPC network information
+# Author: D Paul - Flexion
+
 import argparse
 import boto3
 
@@ -41,8 +44,6 @@ def dump_vpc(vpc):
 
 def dump_subnets(vpc,level):
     '''SUBNETS'''
-    # preload the routes so we can get the id's for our subnets
-    routeTbls = vpc.route_tables.all()
     ### SUBNETS
     subnetFmt = '{0}{1:25}{2:30}{3:20}'
     print(subnetFmt.format('\t'*level,'SUBNET-ID','NAME','CIDR'))
